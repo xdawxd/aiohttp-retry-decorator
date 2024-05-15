@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from functools import wraps
-from typing import Callable, Generator
+from typing import Callable, Generator, NoReturn
 
 from aiohttp import ClientError
 from aiohttp.web_exceptions import HTTPException
@@ -27,11 +27,11 @@ class _Retry:
         self.args: tuple = ()
         self.kwargs: dict = {}
 
-    async def handle_request(self, *args, **kwargs):
+    async def handle_request(self, *args, **kwargs) -> None:
         self.args, self.kwargs = args, kwargs
         await self._make_request()
 
-    async def _make_request(self):
+    async def _make_request(self) -> None:
         try:
             await self._func(*self.args, **self.kwargs)
         except self._retry_on_exceptions as exception:
@@ -76,7 +76,7 @@ def retry(
 
 
 @retry(total=1, log_occurred_exception=True)
-async def test_retry():
+async def test_retry() -> NoReturn:
     raise ClientError
 
 
